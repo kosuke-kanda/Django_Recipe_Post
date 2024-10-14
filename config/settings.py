@@ -39,9 +39,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     
     'recipe',
+    'comment',
+    'staffroom',
 
     "crispy_forms",
     "crispy_bootstrap5",
+    
+    'imagekit', 
 ]
 
 MIDDLEWARE = [
@@ -137,3 +141,6 @@ STATICFILES_DIRS = [
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+MEDIA_ROOT = BASE_DIR / Path('media')
+MEDIA_URL = '/media/'

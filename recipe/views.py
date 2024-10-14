@@ -9,15 +9,25 @@ from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 
 from .models import Recipe
+from comment.forms import CommentForm
 
 
 class RecipeListView(ListView):
     model = Recipe
 
+    def get_queryset(self):
+        qs = Recipe.objects.all()
+        keyword = self.request.GET.get("q")
+
+        if keyword:
+            qs = qs.filter(title__contains=keyword)
+
+        return qs
+
 
 class RecipeCreateView(CreateView):
     model = Recipe
-    fields = ["title", "content", "description"] # 保存するフィールド名
+    fields = ["title", "content", "description", "image"] # 保存するフィールド名
     success_url = reverse_lazy("recipe:index") 
 
     def form_valid(self, form):
@@ -35,7 +45,7 @@ class RecipeDetailView(DetailView):
 
 class RecipeUpdateView(UpdateView):
     model = Recipe
-    fields = ["title", "content", "description"]
+    fields = ["title", "content", "description", "image"]
     
     def get_success_url(self):
         pk = self.kwargs.get("pk")
@@ -52,9 +62,19 @@ class RecipeUpdateView(UpdateView):
 
 class RecipeDeleteView(DeleteView):
     model = Recipe
-    success_url = "/"
-    success_url = reverse_lazy("recipe:index") 
+    # success_url = "/"
+    # success_url = reverse_lazy("recipe:index") 
+
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['CommentForm'] = CommentForm(initial={'recipe': self.object})
+
+        return context
+
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "削除しました")
         return super().delete(request, *args, **kwargs)
+    
